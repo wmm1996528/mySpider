@@ -1,6 +1,7 @@
 import pickle
 import hashlib
 
+
 class UrlManager(object):
     def __init__(self):
         self.new_urls = self.load_progress('new_urls.txt')
@@ -11,7 +12,7 @@ class UrlManager(object):
         判断是否有爬取的url
         :return:
         '''
-        return self.new_url_size() !=0
+        return self.new_url_size() != 0
 
     def get_new_url(self):
         new_url = self.new_urls.pop()
@@ -42,7 +43,6 @@ class UrlManager(object):
 
     def new_url_size(self):
         return len(self.new_urls)
-
 
     def old_url_size(self):
         return len(self.old_urls)
