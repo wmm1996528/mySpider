@@ -6,7 +6,9 @@ from multiprocessing import Process
 from setting import *
 import time
 import sys
+
 sys.path.append("..")
+
 
 class Spiders():
     def __init__(self):
@@ -15,6 +17,7 @@ class Spiders():
         self.parser = HtmlParser()
         self.dataout = DataOutput()
         self.r.put(URLS)
+
     def start(self):
         while self.r.get_size() != 0:
             url = self.r.get_wait()
@@ -26,7 +29,7 @@ class Spiders():
     def process_start(self):
         process = []
         for i in range(THREADNUM):
-            p = Process(target=self.start,args=())
+            p = Process(target=self.start, args=())
             process.append(p)
         for i in range(THREADNUM):
             logger.info('Process %s running........' % i)
@@ -40,6 +43,7 @@ class Spiders():
             self.process_start()
         else:
             self.start()
+
 
 spider = Spiders()
 if __name__ == '__main__':
