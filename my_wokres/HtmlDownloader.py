@@ -2,15 +2,19 @@ import requests
 from my_wokres import RedisWorker
 import time
 from setting import *
+
+
 class HtmlDownloader(object):
     def __init__(self, proxy_bool=None):
+        self.session = requests.session()
         self.bool = proxy_bool
+
     def _get_ip(self):
         url = 'http://127.0.0.1:5555/ip'
         ip = requests.get(url).text
         proxy = {
-            'http':ip,
-            'https':ip,
+            'http': ip,
+            'https': ip,
         }
         return proxy
 
@@ -23,7 +27,7 @@ class HtmlDownloader(object):
             return None
 
         while True:
-            res = requests.get(url, headers=HEADERS, proxies=self.proxy)
+            res = self.session.get(url, headers=HEADERS, proxies=self.proxy)
             if res.status_code == 200:
                 RedisWorker.redisdb.put_old(url)
                 return res.text

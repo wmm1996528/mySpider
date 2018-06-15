@@ -3,6 +3,7 @@ from HtmlDownloader import HtmlDownloader
 from HtmlParser import HtmlParser
 from my_wokres.DataOutput import DataOutput
 
+
 class SpiderWorker():
     def __init__(self):
         BaseManager.register('get_task_queue')

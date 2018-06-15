@@ -1,18 +1,19 @@
-from lxml import etree
 from my_wokres.DataOutput import DataOutput
-
 from my_wokres import RedisWorker
 from lxml import etree
 import traceback
 from my_wokres import RedisWorker
 from my_wokres.DataOutput import DataOutput
 from setting import *
-BASE_URL ='https://www.guazi.com'
+
+BASE_URL = 'https://www.guazi.com'
+
 
 class HtmlParser(object):
     def __init__(self):
         self.r = RedisWorker.redisQueue('new')
         self.data = DataOutput()
+
     def parser(self, url, htmls):
         '''
         解析网页
@@ -28,8 +29,7 @@ class HtmlParser(object):
             h = etree.fromstring(htmls)
         return self._get_datas(url, h)
 
-
-    def _get_datas(self,url, html):
+    def _get_datas(self, url, html):
         try:
             data = {}
             for i in XPAHTS.items():
@@ -38,7 +38,7 @@ class HtmlParser(object):
                 try:
                     names = html.xpath(paths)[0]
                 except:
-                    names= 'NULL'
+                    names = 'NULL'
                 data.update({
                     name: names
                 })
@@ -46,6 +46,8 @@ class HtmlParser(object):
             return data
         except Exception as e:
             logger.warning(traceback.format_exc())
+
+
 if __name__ == '__main__':
     s = HtmlParser()
     f = open('1.html').read()
