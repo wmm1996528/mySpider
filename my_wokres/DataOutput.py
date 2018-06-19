@@ -13,5 +13,5 @@ class DataOutput(object):
         try:
             self.db.insert(data)
         except Exception as e:
-            logger.warning('data error:', e)
             logger.warning(data)
+            logger.warning(e)

@@ -6,6 +6,18 @@ from multiprocessing import Process
 from setting import *
 import time
 import sys
+import asyncio
+
+
+def costTime(func):
+    def wrapper(*args, **kwargs):
+        t1 = time.time()
+        func(*args, **kwargs)
+        t2 = time.time()
+        print(t2 - t1)
+
+    return wrapper
+
 
 sys.path.append("..")
 
@@ -38,28 +50,36 @@ class Spiders():
             process[i].join()
             logger.info('Process %s completed........' % i)
 
+    @costTime
     def run(self):
         if THREADBOOL:
             self.process_start()
         else:
             self.start()
 
+    async def asyncrun(self, url):
+        html = await self.html.download(url)
+        data = self.parser.parser(url, html)
+        print(data)
+        self.dataout.output_mongo(data)
+
+    @costTime
+    def eventLoop(self):
+        urls = [i.decode() for i in self.r.get_all()]
+        tasks = [self.asyncrun(url) for url in urls]
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(asyncio.wait(tasks))
+
 
 spider = Spiders()
 if __name__ == '__main__':
     work = Spiders()
-    work.run()
-    # t1 = time.time()
-    # for i in range(10):
-    #     t = Thread(target=my_wokres.start, args=())
-    #     threads.append(t)
-    # for i in range(len(threads)):
-    #     print('线程% running...' % i)
-    #     threads[i].start()
+    work.eventLoop()
+
+    # def sua():
+    #     n = 0
+    #     for i in range(1000):
+    #         n += i
     #
-    # for i in range(len(threads)):
     #
-    #     threads[i].join()
-    #     print('线程% close...' % i)
-    # t2 = time.time()
-    # print(t2-t1)
+    # sua()

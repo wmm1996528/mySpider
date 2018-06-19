@@ -34,5 +34,8 @@ class redisQueue:
         item = self.__db.spop(self.key)
         return item
 
+    def get_all(self):
+        return self.__db.smembers(self.key)
+
 
 redisdb = redisQueue('old')

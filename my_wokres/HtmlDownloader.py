@@ -2,11 +2,11 @@ import requests
 from my_wokres import RedisWorker
 import time
 from setting import *
+import aiohttp
 
 
 class HtmlDownloader(object):
     def __init__(self, proxy_bool=None):
-        self.session = requests.session()
         self.bool = proxy_bool
 
     def _get_ip(self):
@@ -18,7 +18,7 @@ class HtmlDownloader(object):
         }
         return proxy
 
-    def download(self, url):
+    async def download(self, url):
         if self.bool == True:
             self.proxy = self._get_ip()
         else:
@@ -27,11 +27,12 @@ class HtmlDownloader(object):
             return None
 
         while True:
-            res = self.session.get(url, headers=HEADERS, proxies=self.proxy)
-            if res.status_code == 200:
-                RedisWorker.redisdb.put_old(url)
-                return res.text
-            else:
-                logger.warning(res.status_code)
+            async with aiohttp.ClientSession() as session:
+                async with session.get(url, headers=HEADERS, proxy=self.proxy) as res:
+                    if res.status == 200:
+                        RedisWorker.redisdb.put_old(url)
+                        return await res.text()
+                    else:
+                        logger.warning(res.status)
 
-            time.sleep(0.5)
+                    time.sleep(0.5)

@@ -4,7 +4,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger('spiders')
 
 # 线程数量
-THREADBOOL = True  # True 开启多线程
+THREADBOOL = False  # True 开启多线程
 THREADNUM = 10  # 设定多线程数量
 
 # 代理IP
@@ -14,11 +14,10 @@ HEADERS = {
 PROXYIP = False
 # 配置 urls
 URLS = ['http://sou.zhaopin.com/jobs/searchresult.ashx?in=160400&jl=%E5%8C%97%E4%BA%AC&p={}&isadv=0'.format(i) for i in
-        range(50)]
+        range(100)]
 # s = urls.find({}).limit(2)
 # for i in s:
 #     URLS.append(i['url'])
-print(URLS)
 # 解析规则
 REGULARS = {
 
@@ -31,6 +30,6 @@ XPAHTS = {
 }
 
 # redis 路径
-REDIS_URL = "redis://localhost:6379"
+REDIS_URL = "redis://47.98.165.242:6379"
 # mongo 路径
 MONGO_URL = 'mongodb://127.0.0.1:27017'

@@ -27,8 +27,9 @@ class HtmlParser(object):
             h = etree.HTML(htmls)
         except:
             h = etree.fromstring(htmls)
-        return self._get_datas(url, h)
-
+        # res =
+        res = self._get_datas(url, h)
+        return res
     def _get_datas(self, url, html):
         try:
             data = {}
@@ -42,8 +43,7 @@ class HtmlParser(object):
                 data.update({
                     name: names
                 })
-            print(data)
-            return data
+            return  data
         except Exception as e:
             logger.warning(traceback.format_exc())
 
