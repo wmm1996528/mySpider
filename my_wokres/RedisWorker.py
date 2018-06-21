@@ -5,8 +5,8 @@ from setting import *
 class redisQueue:
     def __init__(self, name, namespace='my'):
         self.__db = redis.from_url(REDIS_URL)
-        self.key = '%s:%s' % (namespace, name)
-        self.old = '%s:old' % namespace
+        self.key = '%s' % name
+        self.old = 'old'
 
     def get_size(self):
 
@@ -24,7 +24,6 @@ class redisQueue:
             self.__db.sadd(self.old, item)
 
     def get_wait(self):
-
         while True:
             item = self.__db.spop(self.key)
             if item:
@@ -36,6 +35,18 @@ class redisQueue:
 
     def get_all(self):
         return self.__db.smembers(self.key)
+
+    def get_old(self):
+        return self.__db.scard(self.old)
+
+    def get_all_num(self):
+        return self.__db.scard(self.key) + self.__db.scard(self.old)
+
+    def set_monit(self, data):
+        self.__db.sadd('monit', data)
+
+    def get_monit(self):
+        self.__db.spop('monit')
 
 
 redisdb = redisQueue('old')

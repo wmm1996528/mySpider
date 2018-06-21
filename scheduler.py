@@ -3,10 +3,12 @@ from my_wokres.HtmlDownloader import HtmlDownloader
 from my_wokres.HtmlParser import HtmlParser
 from my_wokres.DataOutput import DataOutput
 from multiprocessing import Process
+from threading import Thread
 from setting import *
 import time
 import sys
 import asyncio
+from app.monitoring import app
 
 
 def costTime(func):
@@ -29,6 +31,7 @@ class Spiders():
         self.parser = HtmlParser()
         self.dataout = DataOutput()
         self.r.put(URLS)
+        self.app = app
 
     def start(self):
         while self.r.get_size() != 0:
@@ -60,8 +63,33 @@ class Spiders():
     async def asyncrun(self, url):
         html = await self.html.download(url)
         data = self.parser.parser(url, html)
-        print(data)
+        # print(data)
         self.dataout.output_mongo(data)
+
+    def cost(self, data):
+        while True:
+            allUrl = self.r.get_size()
+            now = self.r.get_old()
+            if now == allUrl:
+                scheduledTime = '10000'
+            time.sleep(1)
+            after = self.r.get_old()
+            # print(now, after)
+            speed = after - now
+
+            # print(allUrl - after)
+            # print(speed)
+            if speed == 0:
+                continue
+            scheduledTime = str((allUrl - after) // speed)
+            data.update({
+                'timeNum': scheduledTime,
+                'progess': str(round((after / allUrl) * 100, 3)),
+                'nowNum': after,
+                'wait': allUrl - now
+            })
+            self.r.set_monit(data)
+
 
     @costTime
     def eventLoop(self):
@@ -70,11 +98,23 @@ class Spiders():
         loop = asyncio.get_event_loop()
         loop.run_until_complete(asyncio.wait(tasks))
 
+    def start_monit(self):
+
+        self.app.run(port=2121)
+
+    def eventRun(self):
+        p = Process(target=self.start_monit())
+        p.start()
+        data = {}
+        t = Process(target=self.cost, args=(data,))
+        t.start()
+        self.eventLoop()
+
 
 spider = Spiders()
 if __name__ == '__main__':
     work = Spiders()
-    work.eventLoop()
+    work.eventRun()
 
     # def sua():
     #     n = 0
