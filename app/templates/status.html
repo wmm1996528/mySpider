@@ -57,21 +57,24 @@
     tl = window.setInterval(
         function () {
             $.get('/speed', function (string) {
-
-                if (string == '10000') {
+                var data = eval('(' + string + ')');
+                console.log(data)
+                console.log(typeof data)
+                console.log(typeof data['wait'])
+                if (data['wait'] == 0) {
                     console.log('ada')
                     window.clearInterval(tl)
                     $("#schemd").html('已完成')
                 }
                 else {
-                    var data = eval('(' + string + ')');
+
                     // console.log(data)
                     time = data['timeNum'];
                     progess = data['progess'];
                     wait = data['wait'];
                     now = data['nowNum'];
-                    $('.progress-bar').attr('style', 'width: '+progess+'%; min-width: 4em;')
-                    $('.progress-bar').html(progess+'%')
+                    $('.progress-bar').attr('style', 'width: ' + progess + '%; min-width: 4em;')
+                    $('.progress-bar').html(progess + '%')
                     $('.ls').eq(1).html(now)
                     $('.ls').eq(2).html(wait)
                     // $('.ls').eq(2).html(wait)

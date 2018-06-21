@@ -43,10 +43,10 @@ class redisQueue:
         return self.__db.scard(self.key) + self.__db.scard(self.old)
 
     def set_monit(self, data):
-        self.__db.sadd('monit', data)
+        self.__db.set('monit', data)
 
     def get_monit(self):
-        self.__db.spop('monit')
+        return self.__db.get('monit').decode()
 
 
 redisdb = redisQueue('old')

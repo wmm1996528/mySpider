@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, jsonify
 from pymongo import MongoClient
 from my_wokres import RedisWorker
+import logging
 from threading import Thread
 import time
 import json
@@ -11,12 +12,14 @@ coll = conn.guazi
 db = coll.cars
 
 redisdb = RedisWorker.redisQueue('new')
+from flask.logging import default_handler
 
-
+app.logger.removeHandler(default_handler)
+logging.basicConfig(level=logging.DEBUG)
 @app.route('/')
 def index():
-    return 'This is Spider web!'
 
+    return 'This is Spider web!'
 
 
 
@@ -24,7 +27,7 @@ def index():
 @app.route('/speed')
 def speed():
     data = redisdb.get_monit()
-    return json.dumps(data)
+    return data
 
 
 @app.route('/result')
@@ -43,10 +46,8 @@ def result():
 def status():
     allUrl = redisdb.get_size()
     endUrl = redisdb.get_old()
-    print(endUrl)
     progess = str(round((endUrl / allUrl) * 100, 3))
     datas = [progess, allUrl, endUrl, allUrl - endUrl, '1', '2']
-    print(datas)
     return render_template('status.html', datas=datas)
 
 

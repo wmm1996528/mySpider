@@ -7,6 +7,7 @@ from threading import Thread
 from setting import *
 import time
 import sys
+import os
 import asyncio
 from app.monitoring import app
 
@@ -61,6 +62,7 @@ class Spiders():
             self.start()
 
     async def asyncrun(self, url):
+        # print(url)
         html = await self.html.download(url)
         data = self.parser.parser(url, html)
         # print(data)
@@ -76,20 +78,34 @@ class Spiders():
             after = self.r.get_old()
             # print(now, after)
             speed = after - now
-
+            wait = allUrl - now
+            print(wait)
             # print(allUrl - after)
             # print(speed)
-            if speed == 0:
-                continue
-            scheduledTime = str((allUrl - after) // speed)
-            data.update({
-                'timeNum': scheduledTime,
-                'progess': str(round((after / allUrl) * 100, 3)),
-                'nowNum': after,
-                'wait': allUrl - now
-            })
-            self.r.set_monit(data)
+            if wait == 0:
 
+                try:
+                    scheduledTime = str((allUrl - after) // speed)
+                except:
+                    scheduledTime = '已完成'
+                data.update({
+                    'timeNum': scheduledTime,
+                    'progess': str(round((after / allUrl) * 100, 3)),
+                    'nowNum': after,
+                    'wait': wait
+                })
+                self.r.set_monit(data)
+                os._exit(0)
+                break
+            else:
+                scheduledTime = str((allUrl - after) // speed)
+                data.update({
+                    'timeNum': scheduledTime,
+                    'progess': str(round((after / allUrl) * 100, 3)),
+                    'nowNum': after,
+                    'wait': wait
+                })
+                self.r.set_monit(data)
 
     @costTime
     def eventLoop(self):
@@ -103,10 +119,10 @@ class Spiders():
         self.app.run(port=2121)
 
     def eventRun(self):
-        p = Process(target=self.start_monit())
+        p = Thread(target=self.start_monit, args=())
         p.start()
         data = {}
-        t = Process(target=self.cost, args=(data,))
+        t = Thread(target=self.cost, args=(data,))
         t.start()
         self.eventLoop()
 
