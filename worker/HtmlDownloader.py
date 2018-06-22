@@ -1,5 +1,5 @@
 import requests
-from my_wokres import RedisWorker
+from worker import RedisWorker
 import time
 from setting import *
 import aiohttp

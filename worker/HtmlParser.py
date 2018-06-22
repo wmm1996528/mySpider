@@ -1,9 +1,9 @@
-from my_wokres.DataOutput import DataOutput
-from my_wokres import RedisWorker
+from worker.DataOutput import DataOutput
+from worker import RedisWorker
 from lxml import etree
 import traceback
-from my_wokres import RedisWorker
-from my_wokres.DataOutput import DataOutput
+from worker import RedisWorker
+from worker.DataOutput import DataOutput
 from setting import *
 
 BASE_URL = 'https://www.guazi.com'

@@ -14,7 +14,7 @@ HEADERS = {
 PROXYIP = False
 # 配置 urls
 URLS = ['https://sou.zhaopin.com/jobs/searchresult.ashx?in=160400&jl=%E5%8C%97%E4%BA%AC&p={}&isadv=0'.format(i) for i in
-        range(100)]
+        range(10000)]
 # s = urls.find({}).limit(2)
 # for i in s:
 #     URLS.append(i['url'])

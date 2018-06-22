@@ -1,7 +1,7 @@
-import my_wokres.RedisWorker
-from my_wokres.HtmlDownloader import HtmlDownloader
-from my_wokres.HtmlParser import HtmlParser
-from my_wokres.DataOutput import DataOutput
+import worker.RedisWorker
+from worker.HtmlDownloader import HtmlDownloader
+from worker.HtmlParser import HtmlParser
+from worker.DataOutput import DataOutput
 from multiprocessing import Process
 from threading import Thread
 from setting import *
@@ -27,7 +27,7 @@ sys.path.append("..")
 
 class Spiders():
     def __init__(self):
-        self.r = my_wokres.RedisWorker.redisQueue('new')
+        self.r = worker.RedisWorker.redisQueue('new')
         self.html = HtmlDownloader(None)
         self.parser = HtmlParser()
         self.dataout = DataOutput()
@@ -72,8 +72,6 @@ class Spiders():
         while True:
             allUrl = self.r.get_size()
             now = self.r.get_old()
-            if now == allUrl:
-                scheduledTime = '10000'
             time.sleep(1)
             after = self.r.get_old()
             # print(now, after)
@@ -89,7 +87,7 @@ class Spiders():
                 except:
                     scheduledTime = '已完成'
                 data.update({
-                    'timeNum': scheduledTime,
+                    'timeNum': scheduledTime + '秒',
                     'progess': str(round((after / allUrl) * 100, 3)),
                     'nowNum': after,
                     'wait': wait
@@ -98,9 +96,12 @@ class Spiders():
                 os._exit(0)
                 break
             else:
-                scheduledTime = str((allUrl - after) // speed)
+                try:
+                    scheduledTime = str((allUrl - after) // speed)
+                except ZeroDivisionError:
+                    scheduledTime = 'weizhi'
                 data.update({
-                    'timeNum': scheduledTime,
+                    'timeNum': scheduledTime + '秒',
                     'progess': str(round((after / allUrl) * 100, 3)),
                     'nowNum': after,
                     'wait': wait
@@ -115,7 +116,6 @@ class Spiders():
         loop.run_until_complete(asyncio.wait(tasks))
 
     def start_monit(self):
-
         self.app.run(port=2121)
 
     def eventRun(self):
@@ -124,12 +124,18 @@ class Spiders():
         data = {}
         t = Thread(target=self.cost, args=(data,))
         t.start()
+        logger.info('''
+                    爬虫任务运行中....
+                    访问 http://127.0.0.1:2121/status 获取任务状态
+                    访问 http://127.0.0.1:2121/refult 获取任务结果
+                ''')
         self.eventLoop()
 
 
 spider = Spiders()
 if __name__ == '__main__':
     work = Spiders()
+
     work.eventRun()
 
     # def sua():

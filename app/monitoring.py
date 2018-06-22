@@ -1,8 +1,7 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request
 from pymongo import MongoClient
-from my_wokres import RedisWorker
+from worker import RedisWorker
 import logging
-from threading import Thread
 import time
 import json
 
@@ -13,9 +12,12 @@ db = coll.cars
 
 redisdb = RedisWorker.redisQueue('new')
 from flask.logging import default_handler
-
-app.logger.removeHandler(default_handler)
-logging.basicConfig(level=logging.DEBUG)
+app.logger.level = logging.ERROR
+logger = logging.getLogger("mylog")
+fmter = logging.Formatter('%(asctime)s %(levelname)s %(message)s', datefmt='%a, %d %b %Y %H:%M:%S')
+hdlr = logging.FileHandler("pro.log")
+hdlr.setFormatter(fmt=fmter)
+app.logger.addHandler(hdlr=hdlr)
 @app.route('/')
 def index():
 

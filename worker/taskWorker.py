@@ -1,7 +1,7 @@
 from multiprocessing.managers import BaseManager
 from HtmlDownloader import HtmlDownloader
 from HtmlParser import HtmlParser
-from my_wokres.DataOutput import DataOutput
+from worker.DataOutput import DataOutput
 
 
 class SpiderWorker():
